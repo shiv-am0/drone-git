@@ -21,6 +21,22 @@ COPY --from=core /windows/system32/netapi32.dll /windows/system32/netapi32.dll
 
 ADD windows/* /bin/
 
+ARG GIT_LFS_VERSION=2.5.2
+ENV GIT_LFS_DOWNLOAD_URL https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-windows-amd64-v${GIT_LFS_VERSION}.zip
+RUN Write-Host ('Downloading {0} ...' -f $env:GIT_LFS_DOWNLOAD_URL); 
+RUN	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; 
+RUN	Invoke-WebRequest -Uri $env:GIT_LFS_DOWNLOAD_URL -OutFile 'git-lfs.zip'; 
+RUN	Write-Host 'Expanding ...'; 
+RUN	Expand-Archive -Path git-lfs.zip -DestinationPath C:\git-lfs\.; 
+RUN	Write-Host 'Removing ...'; 
+RUN	Remove-Item git-lfs.zip -Force; 
+RUN	Write-Host 'Updating PATH ...'; 
+RUN	$env:PATH = 'C:\git-lfs;' + $env:PATH; 
+RUN	[Environment]::SetEnvironmentVariable('PATH', $env:PATH, [EnvironmentVariableTarget]::Machine); 
+RUN	Write-Host 'Installing ...'; 
+RUN	Write-Host 'git lfs install'; git lfs install --system; 
+RUN	Write-Host 'Complete.';
+
 # https://github.com/PowerShell/PowerShell/issues/6211#issuecomment-367477137
 USER ContainerAdministrator
 RUN setx /M PATH "%PATH%;C:\Program Files\PowerShell;C:\git\cmd;C:\git\mingw64\bin;C:\git\usr\bin;C:\openssh"

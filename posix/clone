@@ -100,6 +100,9 @@ pull_request)
 tag)
 	clone-tag
 	;;
+lfs)
+    clone-lfs
+    ;;
 *)
 	clone-commit
 	;;
