@@ -1,15 +1,26 @@
 #!/bin/sh
 
-# FLAGS=""
-# if [ ! -z "${PLUGIN_DEPTH}" ]; then
-# 	FLAGS="--depth=${PLUGIN_DEPTH}"
-# fi
+if [ "$HARNESS_GIT_PROXY" = "true" ] && [ -n "$HARNESS_HTTPS_PROXY" ]; then
+  set -x
+  git config --global http.proxy "$HARNESS_HTTPS_PROXY"
+  set +x
+fi
 
-# if [ "$HARNESS_GIT_PROXY" = "true" ] && [ -n "$HARNESS_HTTPS_PROXY" ]; then
-#   set -x
-#   git config --global http.proxy "$HARNESS_HTTPS_PROXY"
-#   set +x
-# fi
+# Check if PLUGIN_COMMIT_METADATA is not empty
+if [ -n "${PLUGIN_COMMIT_METADATA}" ]; then
+    echo "PLUGIN_COMMIT_METADATA is not empty. Logging commit metadata:"
+    git log
+else
+    echo "PLUGIN_COMMIT_METADATA is empty. Skipping commit metadata logging."
+fi
+
+# Check if PLUGIN_BRANCH_METADATA is not empty
+if [ -n "${PLUGIN_BRANCH_METADATA}" ]; then
+    echo "PLUGIN_BRANCH_METADATA is not empty. Logging branch metadata:"
+    git branch
+else
+    echo "PLUGIN_BRANCH_METADATA is empty. Skipping branch metadata logging."
+fi
 
 # Initialize Git LFS
 echo "Initializing Git LFS..."
