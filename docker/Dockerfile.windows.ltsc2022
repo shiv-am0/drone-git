@@ -21,6 +21,7 @@ COPY --from=git C:\Windows\System32\OpenSSH\ /openssh
 
 ADD windows/* /bin/
 
+ARG GIT_LFS_VERSION=2.5.2
 ENV GIT_LFS_DOWNLOAD_URL https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-windows-amd64-v${GIT_LFS_VERSION}.zip
 RUN powershell.exe -Command Write-Host ('Downloading {0} ...' -f $env:GIT_LFS_DOWNLOAD_URL); 
 RUN powershell.exe [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; 
