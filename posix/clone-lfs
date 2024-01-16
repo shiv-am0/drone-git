@@ -1,6 +1,17 @@
 #!/bin/sh
 
-# Install Git LFS
+# FLAGS=""
+# if [ ! -z "${PLUGIN_DEPTH}" ]; then
+# 	FLAGS="--depth=${PLUGIN_DEPTH}"
+# fi
+
+# if [ "$HARNESS_GIT_PROXY" = "true" ] && [ -n "$HARNESS_HTTPS_PROXY" ]; then
+#   set -x
+#   git config --global http.proxy "$HARNESS_HTTPS_PROXY"
+#   set +x
+# fi
+
+# Initialize Git LFS
 echo "Initializing Git LFS..."
 # curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash
 # microdnf install git-lfs -y
@@ -8,7 +19,7 @@ git lfs install
 
 # Clone the LFS-configured repository
 echo "Cloning repository with Git LFS..."
-git lfs clone ${DRONE_REMOTE_URL} ${DRONE_WORKSPACE}
+git lfs clone ${PLUGIN_LFS_REPO} ${PLUGIN_CLONE_DIR}
 
 echo "Git LFS clone completed."
 ls .

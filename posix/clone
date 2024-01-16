@@ -85,6 +85,12 @@ export GIT_COMMITTER_EMAIL=${DRONE_COMMIT_AUTHOR_EMAIL}
 # TODO we should ultimately look at the ref, since
 # we need something compatible with deployment events.
 
+# Invoke the lfs script if PLGIN_LFS_CONFIG is set to true
+if [ "$PLUGIN_LFS_CONFIG" = "true" ]; then
+	clone-lfs
+	exit 0
+fi
+
 CLONE_TYPE=$DRONE_BUILD_EVENT
 case $DRONE_COMMIT_REF in
   refs/tags/* ) CLONE_TYPE=tag ;;
@@ -100,9 +106,6 @@ pull_request)
 tag)
 	clone-tag
 	;;
-lfs)
-    clone-lfs
-    ;;
 *)
 	clone-commit
 	;;
