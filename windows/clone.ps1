@@ -60,6 +60,12 @@ $Env:GIT_COMMITTER_EMAIL = $Env:GIT_AUTHOR_EMAIL
 # TODO we should ultimately look at the ref, since
 # we need something compatible with deployment events.
 
+# Invoke the lfs script if PLUGIN_LFS_CONFIG is set to true
+if ($env:PLUGIN_LFS_CONFIG -eq "true") {
+    .\clone-lfs.ps1
+    exit 0
+}
+
 Set-Variable -Name "CLONE_TYPE" -Value "$Env:DRONE_BUILD_EVENT"
 switch -regex ($Env:DRONE_COMMIT_REF)
 {
