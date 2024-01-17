@@ -9,11 +9,14 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     Expand-Archive git.zip -DestinationPath C:\git;
 
 # Install Git LFS
-RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; `
-    Invoke-WebRequest -UseBasicParsing https://github.com/git-lfs/git-lfs/releases/download/v2.14.1/git-lfs-windows-v2.14.1.zip -OutFile git-lfs.zip; `
-    Expand-Archive git-lfs.zip -DestinationPath C:\git-lfs; `
-    Move-Item -Path C:\git-lfs\git-lfs.exe -Destination C:\git\mingw64\bin; `
-    Remove-Item -Force -Recurse C:\git-lfs, C:\git-lfs.zip;
+RUN powershell.exe -Command `
+    "$ErrorActionPreference = 'Stop'; `
+    $ProgressPreference = 'SilentlyContinue'; `
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; `
+    Invoke-WebRequest -UseBasicParsing -Uri 'https://github.com/git-lfs/git-lfs/releases/download/v2.14.1/git-lfs-windows-v2.14.1.zip' -OutFile 'git-lfs.zip'; `
+    Expand-Archive -Path 'git-lfs.zip' -DestinationPath 'C:\git-lfs'; `
+    Move-Item -Path 'C:\git-lfs\git-lfs.exe' -Destination 'C:\git\mingw64\bin'; `
+    Remove-Item -Path 'C:\git-lfs', 'C:\git-lfs.zip' -Force -Recurse"
 
 # Final image
 FROM mcr.microsoft.com/windows/servercore:ltsc2022
