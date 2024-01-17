@@ -1,50 +1,85 @@
+# # escape=`
+
+# FROM mcr.microsoft.com/windows/servercore:ltsc2022 as core
+
+
+# FROM mcr.microsoft.com/windows/servercore:ltsc2022 AS git
+# SHELL ["powershell.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+# RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; `
+#     Invoke-WebRequest -UseBasicParsing https://github.com/git-for-windows/git/releases/download/v2.39.2.windows.1/MinGit-2.39.2-64-bit.zip -OutFile git.zip; `
+#     Expand-Archive git.zip -DestinationPath C:\git;
+
+# RUN Add-WindowsCapability -Online -Name OpenSSH.Client*
+
+
+# FROM mcr.microsoft.com/powershell:windowsservercore-ltsc2022
+# COPY --from=git /git /git
+
+# COPY --from=git C:\Windows\System32\OpenSSH\ /openssh
+# # COPY --from=core /windows/system32/netapi32.dll /windows/system32/netapi32.dll
+
+# ADD windows/* /bin/
+
+# # Install Git LFS
+# RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; `
+#     Invoke-WebRequest -UseBasicParsing https://github.com/git-lfs/git-lfs/releases/download/v2.14.1/git-lfs-windows-v2.14.1.zip -OutFile git-lfs.zip; `
+#     Expand-Archive git-lfs.zip -DestinationPath C:\git-lfs; `
+#     Move-Item -Path C:\git-lfs\git-lfs.exe -Destination C:\git\mingw64\bin; `
+#     Remove-Item -Force -Recurse C:\git-lfs, C:\git-lfs.zip;
+
+# # ARG GIT_LFS_VERSION=2.5.2
+# # ENV GIT_LFS_DOWNLOAD_URL https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-windows-amd64-v${GIT_LFS_VERSION}.zip
+# # RUN powershell.exe -Command Write-Host ('Downloading {0} ...' -f $env:GIT_LFS_DOWNLOAD_URL); 
+# # RUN powershell.exe [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; 
+# # RUN powershell.exe Invoke-WebRequest -Uri $env:GIT_LFS_DOWNLOAD_URL -OutFile 'git-lfs.zip'; 
+# # RUN powershell.exe Write-Host 'Expanding ...'; 
+# # RUN powershell.exe Expand-Archive -Path git-lfs.zip -DestinationPath C:\git-lfs\.; 
+# # RUN powershell.exe Write-Host 'Removing ...'; 
+# # RUN powershell.exe Remove-Item git-lfs.zip -Force; 
+# # RUN powershell.exe Write-Host 'Updating PATH ...'; 
+# # RUN powershell.exe $env:PATH = 'C:\git-lfs;' + $env:PATH; 
+# # RUN powershell.exe [Environment]::SetEnvironmentVariable('PATH', $env:PATH, [EnvironmentVariableTarget]::Machine); 
+# # RUN powershell.exe Write-Host 'Installing ...'; 
+# # RUN powershell.exe Write-Host 'git lfs install'; git lfs install --system; 
+# # RUN powershell.exe Write-Host 'Complete.';
+
+# # https://github.com/PowerShell/PowerShell/issues/6211#issuecomment-367477137
+# USER ContainerAdministrator
+# RUN setx /M PATH "%PATH%;C:\Program Files\PowerShell;C:\git\cmd;C:\git\mingw64\bin;C:\git\usr\bin;C:\openssh"
+
+# SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+# CMD [ "pwsh", "C:\\bin\\clone.ps1" ]
+
+# New
 # escape=`
 
 FROM mcr.microsoft.com/windows/servercore:ltsc2022 as core
 
-
 FROM mcr.microsoft.com/windows/servercore:ltsc2022 AS git
 SHELL ["powershell.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; `
-    Invoke-WebRequest -UseBasicParsing https://github.com/git-for-windows/git/releases/download/v2.39.2.windows.1/MinGit-2.39.2-64-bit.zip -OutFile git.zip; `
-    Expand-Archive git.zip -DestinationPath C:\git;
+RUN powershell.exe -Command \
+    "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
+    Invoke-WebRequest -UseBasicParsing -Uri 'https://github.com/git-for-windows/git/releases/download/v2.39.2.windows.1/MinGit-2.39.2-64-bit.zip' -OutFile 'git.zip'; \
+    Expand-Archive -Path 'C:\git.zip' -DestinationPath 'C:\git'"
 
 RUN Add-WindowsCapability -Online -Name OpenSSH.Client*
 
-
 FROM mcr.microsoft.com/powershell:windowsservercore-ltsc2022
 COPY --from=git /git /git
-
 COPY --from=git C:\Windows\System32\OpenSSH\ /openssh
-# COPY --from=core /windows/system32/netapi32.dll /windows/system32/netapi32.dll
 
 ADD windows/* /bin/
 
-# Install Git LFS
-RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; `
-    Invoke-WebRequest -UseBasicParsing https://github.com/git-lfs/git-lfs/releases/download/v2.14.1/git-lfs-windows-v2.14.1.zip -OutFile git-lfs.zip; `
-    Expand-Archive git-lfs.zip -DestinationPath C:\git-lfs; `
-    Move-Item -Path C:\git-lfs\git-lfs.exe -Destination C:\git\mingw64\bin; `
-    Remove-Item -Force -Recurse C:\git-lfs, C:\git-lfs.zip;
+RUN powershell.exe -Command \
+    "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
+    Invoke-WebRequest -UseBasicParsing -Uri 'https://github.com/git-lfs/git-lfs/releases/download/v2.14.1/git-lfs-windows-v2.14.1.zip' -OutFile 'git-lfs.zip'; \
+    Expand-Archive -Path 'git-lfs.zip' -DestinationPath 'C:\git-lfs'; \
+    Move-Item -Path 'C:\git-lfs\git-lfs.exe' -Destination 'C:\git\mingw64\bin'; \
+    Remove-Item -Path 'C:\git-lfs', 'C:\git-lfs.zip' -Force -Recurse"
 
-# ARG GIT_LFS_VERSION=2.5.2
-# ENV GIT_LFS_DOWNLOAD_URL https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-windows-amd64-v${GIT_LFS_VERSION}.zip
-# RUN powershell.exe -Command Write-Host ('Downloading {0} ...' -f $env:GIT_LFS_DOWNLOAD_URL); 
-# RUN powershell.exe [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; 
-# RUN powershell.exe Invoke-WebRequest -Uri $env:GIT_LFS_DOWNLOAD_URL -OutFile 'git-lfs.zip'; 
-# RUN powershell.exe Write-Host 'Expanding ...'; 
-# RUN powershell.exe Expand-Archive -Path git-lfs.zip -DestinationPath C:\git-lfs\.; 
-# RUN powershell.exe Write-Host 'Removing ...'; 
-# RUN powershell.exe Remove-Item git-lfs.zip -Force; 
-# RUN powershell.exe Write-Host 'Updating PATH ...'; 
-# RUN powershell.exe $env:PATH = 'C:\git-lfs;' + $env:PATH; 
-# RUN powershell.exe [Environment]::SetEnvironmentVariable('PATH', $env:PATH, [EnvironmentVariableTarget]::Machine); 
-# RUN powershell.exe Write-Host 'Installing ...'; 
-# RUN powershell.exe Write-Host 'git lfs install'; git lfs install --system; 
-# RUN powershell.exe Write-Host 'Complete.';
 
-# https://github.com/PowerShell/PowerShell/issues/6211#issuecomment-367477137
 USER ContainerAdministrator
 RUN setx /M PATH "%PATH%;C:\Program Files\PowerShell;C:\git\cmd;C:\git\mingw64\bin;C:\git\usr\bin;C:\openssh"
 
