@@ -23,10 +23,10 @@ ADD windows/* /bin/
 
 # Install Git LFS
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; `
-    Invoke-WebRequest -UseBasicParsing https://github.com/git-lfs/git-lfs/releases/download/v2.14.1/git-lfs-windows-v2.14.1.zip -OutFile git-lfs.zip; `
-    Expand-Archive git-lfs.zip -DestinationPath C:\git-lfs; `
-    Move-Item -Path C:\git-lfs\git-lfs.exe -Destination C:\git\mingw64\bin; `
-    Remove-Item -Force -Recurse C:\git-lfs, C:\git-lfs.zip;
+    Invoke-WebRequest -UseBasicParsing -Uri 'https://github.com/git-lfs/git-lfs/releases/download/v2.14.1/git-lfs-windows-v2.14.1.zip' -OutFile 'C:\git-lfs.zip'; `
+    Expand-Archive -Path 'C:\git-lfs.zip' -DestinationPath 'C:\git-lfs'; `
+    Move-Item -Path 'C:\git-lfs\git-lfs.exe' -Destination 'C:\git\mingw64\bin'; `
+    Remove-Item -Path 'C:\git-lfs', 'C:\git-lfs.zip' -Force -Recurse
 
 # ARG GIT_LFS_VERSION=2.5.2
 # ENV GIT_LFS_DOWNLOAD_URL https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-windows-amd64-v${GIT_LFS_VERSION}.zip
