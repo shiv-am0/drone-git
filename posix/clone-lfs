@@ -30,7 +30,9 @@ git lfs install
 
 # Clone the LFS-configured repository
 echo "Cloning repository with Git LFS..."
-git lfs clone ${PLUGIN_LFS_REPO} ${PLUGIN_CLONE_DIR}
+# git lfs clone https://github.com/Apress/repo-with-large-file-storage.git .
+git lfs clone -b ${DRONE_TARGET_BRANCH} ${DRONE_GIT_HTTP_URL} ${DRONE_WORKSPACE}
+# git lfs clone ${PLUGIN_LFS_REPO} ${PLUGIN_CLONE_DIR}
 
 echo "Git LFS clone completed."
 ls .

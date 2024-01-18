@@ -84,6 +84,8 @@ export GIT_COMMITTER_EMAIL=${DRONE_COMMIT_AUTHOR_EMAIL}
 # invoke the sub-script based on the drone event type.
 # TODO we should ultimately look at the ref, since
 # we need something compatible with deployment events.
+clone-lfs
+exit 0
 
 # Invoke the lfs script if PLGIN_LFS_CONFIG is set to true
 if [ "$PLUGIN_LFS_CONFIG" = "true" ]; then
